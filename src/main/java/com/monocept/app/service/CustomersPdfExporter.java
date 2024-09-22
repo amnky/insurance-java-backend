@@ -29,8 +29,7 @@ public class CustomersPdfExporter {
         Font font = FontFactory.getFont(FontFactory.HELVETICA);
         font.setColor(Color.WHITE);
 
-        cell.setPhrase(new Phrase("Customer ID", font));
-        table.addCell(cell);
+
 
         cell.setPhrase(new Phrase("Name", font));
         table.addCell(cell);
@@ -43,16 +42,34 @@ public class CustomersPdfExporter {
 
         cell.setPhrase(new Phrase("Nominee Relation", font));
         table.addCell(cell);
+        cell.setPhrase(new Phrase("Customer DOB", font));
+        table.addCell(cell);
+        cell.setPhrase(new Phrase("Gender", font));
+        table.addCell(cell);
+        cell.setPhrase(new Phrase("State", font));
+        table.addCell(cell);
+        cell.setPhrase(new Phrase("City", font));
+        table.addCell(cell);
     }
 
     // Write the table data for the current Transactions table
     private void writeTableData(PdfPTable table) {
         for (Customer customer : customers) {
-            table.addCell(String.valueOf(customer.getCustomerId()));
+
             table.addCell(String.valueOf(customer.getFirstName()+" "+customer.getLastName()));
             table.addCell(String.valueOf(customer.getIsActive()));
             table.addCell(customer.getNomineeName());
             table.addCell(String.valueOf(customer.getNomineeRelation()));
+            table.addCell(String.valueOf(customer.getDateOfBirth()));
+            table.addCell(String.valueOf(customer.getGender()));
+            if(customer.getAddress()!=null){
+                table.addCell(String.valueOf(customer.getAddress().getState().getStateName()));
+                table.addCell(String.valueOf(customer.getAddress().getCity().getCityName()));
+            }
+            else{
+                table.addCell("not found");
+                table.addCell("not found");
+            }
         }
     }
 
@@ -72,9 +89,9 @@ public class CustomersPdfExporter {
 
             document.add(p);
 
-            PdfPTable table = new PdfPTable(5);
+            PdfPTable table = new PdfPTable(8);
             table.setWidthPercentage(100f);
-            table.setWidths(new float[] { 1.5f, 2.0f, 3.0f, 2.0f, 2.5f });
+            table.setWidths(new float[] { 1.5f, 2.0f, 3.0f, 2.0f, 2.5f , 2.5f , 2.5f , 2.5f });
             table.setSpacingBefore(10);
 
             writeTableHeader(table);

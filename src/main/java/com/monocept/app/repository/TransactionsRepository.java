@@ -37,4 +37,11 @@ public interface TransactionsRepository extends JpaRepository<Transactions,Long>
 
 
 	Page<Transactions> findAllByPolicyAccountIn(List<PolicyAccount> agentAccounts, Pageable pageable);
+
+	@Query("SELECT t from Transactions t where t.status = ?1")
+	Page<Transactions> findAllByStatus(Pageable pageable, String status);
+
+	Page<Transactions> findAllByPolicyAccountInAndStatus(List<PolicyAccount> agentAccounts, Pageable pageable, String done);
+
+	Page<Transactions> findAllByPolicyAccountAndStatus(PolicyAccount policyAccount, Pageable pageable, String done);
 }

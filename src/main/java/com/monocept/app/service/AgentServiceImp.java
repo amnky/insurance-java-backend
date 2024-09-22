@@ -282,7 +282,7 @@ public class AgentServiceImp implements AgentService {
         Set<Long> ids = new HashSet<>();
         List<Customer> customerList=new ArrayList<>();
         for (PolicyAccount policyAccount : policyAccounts) {
-            if(!ids.contains(policyAccount.getCustomer().getCustomerId())){
+            if(!ids.contains(policyAccount.getCustomer().getCustomerId()) && policyAccount.getCustomer().getIsApproved()){
                 customerList.add(policyAccount.getCustomer());
                 ids.add(policyAccount.getCustomer().getCustomerId());
             }
@@ -522,7 +522,7 @@ public class AgentServiceImp implements AgentService {
         Pageable pageable = PageRequest.of(pageNo, size, sorting);
         if(role.equals("EMPLOYEE") || role.equals("ADMIN")){
 
-            Page<Transactions> pages = transactionsRepository.findAll(pageable);
+            Page<Transactions> pages = transactionsRepository.findAllByStatus(pageable,"Done");
             List<Transactions> allTransactions = pages.getContent();
             List<TransactionsDTO> allTransactionsDTO = dtoService.convertTransactionListEntityToDTO(allTransactions);
 

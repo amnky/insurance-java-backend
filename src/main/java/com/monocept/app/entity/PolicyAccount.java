@@ -106,7 +106,7 @@ public class PolicyAccount {
     @JsonBackReference
     private Customer customer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "agent_id")
     @JsonBackReference
     private Agent agent;

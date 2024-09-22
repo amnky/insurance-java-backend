@@ -78,8 +78,8 @@ public class AuthServiceImp implements AuthService{
 		    	}
 		    }
 		    if(credentials.getAgent() != null) {
-		    	if(!credentials.getCustomer().getIsActive()) {
-		    		throw new UserException("Can't Login!. You are inactive");
+		    	if(!credentials.getAgent().getIsActive()) {
+//		    		throw new UserException("Can't Login!. You are inactive");
 		    	}
 		    	else if(!credentials.getAgent().getIsApproved()) {
 		    		throw new UserException("Can't Login!. Your profile is for under review. Login After verification");
@@ -110,7 +110,7 @@ public class AuthServiceImp implements AuthService{
             throw new UserException(e.getMessage());
         } 
     	catch (Exception e) {
-            throw new UserException("Login failed! Please try again later");
+            throw new UserException(e.getMessage());
         }
     }
 

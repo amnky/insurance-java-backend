@@ -32,38 +32,45 @@ public class PolicyAccountPdfExporter {
         cell.setPhrase(new Phrase("Name", font));
         table.addCell(cell);
 
-        cell.setPhrase(new Phrase("Active", font));
+        cell.setPhrase(new Phrase("nominee", font));
         table.addCell(cell);
 
-        cell.setPhrase(new Phrase("Total amount paid", font));
+        cell.setPhrase(new Phrase("relation", font));
         table.addCell(cell);
 
-        cell.setPhrase(new Phrase("claim amount", font));
+
+        cell.setPhrase(new Phrase("paid", font));
         table.addCell(cell);
 
-        cell.setPhrase(new Phrase("agent ID", font));
+        cell.setPhrase(new Phrase("balance", font));
         table.addCell(cell);
 
-        cell.setPhrase(new Phrase("customer id", font));
+        cell.setPhrase(new Phrase("claim", font));
         table.addCell(cell);
 
-        cell.setPhrase(new Phrase("investment amount", font));
+        cell.setPhrase(new Phrase("investment", font));
         table.addCell(cell);
+
+        cell.setPhrase(new Phrase("Trans period", font));
+        table.addCell(cell);
+
+
+
+
+
+
     }
 
     private void writeTableData(PdfPTable table) {
         for (PolicyAccount policyAccounts1 : policyAccounts) {
             table.addCell(policyAccounts1.getCustomer().getFirstName()+" "+policyAccounts1.getCustomer().getLastName());
-            table.addCell(String.valueOf(policyAccounts1.getIsActive()));
+            table.addCell(String.valueOf(policyAccounts1.getNomineeName()));
+            table.addCell(String.valueOf(policyAccounts1.getNomineeRelation()));
             table.addCell(String.valueOf(policyAccounts1.getTotalAmountPaid()));
+            table.addCell(String.valueOf(policyAccounts1.getTimelyBalance()));
             table.addCell(String.valueOf(policyAccounts1.getClaimAmount()));
-            if(policyAccounts1.getAgent()!=null){
-                table.addCell(String.valueOf(policyAccounts1.getAgent().getAgentId()));
-            }
-            else table.addCell(("null"));
-            table.addCell(String.valueOf(policyAccounts1.getCustomer().getCustomerId()));
             table.addCell(String.valueOf(policyAccounts1.getInvestmentAmount()));
-
+            table.addCell(String.valueOf(policyAccounts1.getPaymentTimeInMonths()));
         }
     }
 
@@ -82,9 +89,9 @@ public class PolicyAccountPdfExporter {
 
             document.add(p);
 
-            PdfPTable table = new PdfPTable(7);
+            PdfPTable table = new PdfPTable(8);
             table.setWidthPercentage(100f);
-            table.setWidths(new float[] { 2.0f, 2.5f, 2.0f, 2.0f, 2.5f, 2.5f, 2.5f });
+            table.setWidths(new float[] { 2.0f, 2.0f, 2.0f,1.5f, 1.5f, 2.5f,2.5f,1.5f });
             table.setSpacingBefore(10);
 
             writeTableHeader(table);

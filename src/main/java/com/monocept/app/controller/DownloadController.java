@@ -145,33 +145,7 @@ public class DownloadController {
 
 	    return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
-	@Operation(summary = "By All: Download transactions for a specific policy account in PDF format")
-	@GetMapping("/policy-account/download/pdf")
-	public ResponseEntity<String> getPolicyAccountFile(
-			HttpServletResponse response,
-			@PathVariable(name ="id") Long policyId,
-			@RequestParam(name = "page", defaultValue = "0") int page,
-			@RequestParam(name = "size", defaultValue = "5") int size,
-			@RequestParam(name = "sortBy", defaultValue = "policyAccountId") String sortBy,
-			@RequestParam(name = "direction", defaultValue = "asc") String direction,
-			@RequestParam(name = "isActive", defaultValue = "true") Boolean isActive) {
 
-		response.setContentType("application/pdf");
-        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        String currentDateTime = dateFormatter.format(new Date());
-         
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
-        response.setHeader(headerKey, headerValue);
-	    
-        List<Transactions> transactions = downloadService.getTransactionByAccountNumber(policyId,page,size,sortBy,direction,isActive);
-        
-        TransactionPdfExporter exporter = new TransactionPdfExporter(transactions);
-        exporter.export(response);
-
-	    return new ResponseEntity<>(HttpStatus.OK);
-	}
 	@Operation(summary = "By All: Download transactions for a specific policy account in PDF format")
 	@GetMapping("/customer/download/pdf")
 	public ResponseEntity<String> getAllCustomersInPdf(

@@ -30,8 +30,7 @@ public class AgentsPdfExporter {
         Font font = FontFactory.getFont(FontFactory.HELVETICA);
         font.setColor(Color.WHITE);
 
-        cell.setPhrase(new Phrase("Agent ID", font));
-        table.addCell(cell);
+
 
         cell.setPhrase(new Phrase("Name", font));
         table.addCell(cell);
@@ -44,16 +43,35 @@ public class AgentsPdfExporter {
 
         cell.setPhrase(new Phrase("Balance", font));
         table.addCell(cell);
+
+        cell.setPhrase(new Phrase("withdrawal amount", font));
+        table.addCell(cell);
+        cell.setPhrase(new Phrase("DOB", font));
+        table.addCell(cell);
+        cell.setPhrase(new Phrase("State", font));
+        table.addCell(cell);
+        cell.setPhrase(new Phrase("City", font));
+        table.addCell(cell);
     }
 
     // Write the table data for the current Transactions table
     private void writeTableData(PdfPTable table) {
         for (Agent agent : agents) {
-            table.addCell(String.valueOf(agent.getAgentId()));
+
             table.addCell(String.valueOf(agent.getFirstName()+" "+agent.getLastName()));
             table.addCell(String.valueOf(agent.getIsActive()));
             table.addCell(agent.getQualification());
             table.addCell(String.valueOf(agent.getBalance()));
+            table.addCell(String.valueOf(agent.getWithdrawalAmount()));
+            table.addCell(String.valueOf(agent.getDateOfBirth()));
+            if(agent.getAddress()!=null){
+                table.addCell(String.valueOf(agent.getAddress().getState().getStateName()));
+                table.addCell(String.valueOf(agent.getAddress().getCity().getCityName()));
+            }
+            else{
+                table.addCell("not found");
+                table.addCell("not found");
+            }
         }
     }
 
@@ -73,9 +91,9 @@ public class AgentsPdfExporter {
 
             document.add(p);
 
-            PdfPTable table = new PdfPTable(5);
+            PdfPTable table = new PdfPTable(8);
             table.setWidthPercentage(100f);
-            table.setWidths(new float[] { 1.5f, 2.0f, 3.0f, 2.0f, 2.5f});
+            table.setWidths(new float[] { 3.5f, 2.0f, 2.0f, 2.0f, 2.5f, 2.5f, 3.5f, 3.5f});
             table.setSpacingBefore(10);
 
             writeTableHeader(table);

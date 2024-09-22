@@ -176,7 +176,7 @@ public class AgentController {
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
-            @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "customerId") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection
     ) {
         PagedResponse<CustomerDTO> customerDTOPagedResponse = agentService.
@@ -185,7 +185,12 @@ public class AgentController {
     }
     @Operation(summary = "By Admin,emp: Get All inactive customers")
     @GetMapping("/inactive-customers")
-    ResponseEntity<PagedResponse<CustomerDTO>> getAllInActiveCustomers(@RequestParam(name = "page", defaultValue = "0") int page, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "ASC") String sort, @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy, @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
+    ResponseEntity<PagedResponse<CustomerDTO>> getAllInActiveCustomers(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "sort", defaultValue = "ASC") String sort,
+            @RequestParam(name = "sortBy", defaultValue = "customerId") String sortBy,
+            @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
         PagedResponse<CustomerDTO> allCustomers = customerService.getAllInActiveCustomers(page, size, sort, sortBy, sortDirection);
         return new ResponseEntity<>(allCustomers, HttpStatus.OK);
     }
@@ -195,7 +200,7 @@ public class AgentController {
             @RequestParam(name = "page", defaultValue = "0")
             int page, @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
-            @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "customerId") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
         PagedResponse<CustomerDTO> allCustomers = customerService.getAllActiveCustomers(page, size, sort, sortBy, sortDirection);
         return new ResponseEntity<>(allCustomers, HttpStatus.OK);

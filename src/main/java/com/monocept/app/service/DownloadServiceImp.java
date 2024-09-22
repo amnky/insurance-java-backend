@@ -104,7 +104,7 @@ public class DownloadServiceImp implements DownloadService{
 	                "Policy Account ID", "Created Date", "Matured Date", "Is Active", 
 	                "Policy Term", "Payment Time in Months", "Timely Balance", 
 	                "Investment Amount", "Total Amount Paid", "Claim Amount", 
-	                "Agent Commission", "Customer Name", "Agent Name", "Policy ID"
+	                "Agent Commission", "Customer Name", "Policy ID"
 	            ));
 	    	
 	      for (PolicyAccount policyAccount : policyAccounts) {
@@ -120,13 +120,9 @@ public class DownloadServiceImp implements DownloadService{
                   String.valueOf(policyAccount.getTotalAmountPaid()),
                   String.valueOf(policyAccount.getClaimAmount()),
                   String.valueOf(policyAccount.getAgentCommissionForRegistration()),
-                  (policyAccount.getCustomer().getFirstName()+" "+policyAccount.getCustomer().getLastName())
+                  (policyAccount.getCustomer().getFirstName()+" "+policyAccount.getCustomer().getLastName()),
+					String.valueOf(policyAccount.getPolicy().getPolicyId())
 	            );
-			  String agentName = (policyAccount.getAgent() != null)
-					  ? policyAccount.getAgent().getFirstName() + " " + policyAccount.getAgent().getLastName()
-					  : "not present";
-			  data.add(agentName);
-			  data.add(String.valueOf(policyAccount.getPolicy().getPolicyId()));
 
 	        csvPrinter.printRecord(data);
 	      }
@@ -137,8 +133,7 @@ public class DownloadServiceImp implements DownloadService{
 	      throw new RuntimeException("fail to import data to CSV file: " + e.getMessage());
 	    }
 	}
-	
-	
+
 	public ByteArrayInputStream customerLoad(int page, int size, String sortBy, String direction, Boolean isActive) {
 
 		List<Customer> customers =getAllCustomersInPdf( page, size, sortBy, direction, isActive);
@@ -267,15 +262,15 @@ public class DownloadServiceImp implements DownloadService{
 			CustomUserDetails userDetails=accessConService.checkUserAccess();
 			Agent agent=findAgent(userDetails.getId());
 			List<PolicyAccount> agentAccounts=agent.getPolicyAccounts();
-			pages=transactionRepository.findAllByPolicyAccountIn(agentAccounts,pageable);
+			pages=transactionRepository.findAllByPolicyAccountInAndStatus(agentAccounts,pageable,"Done");
 		}
 		else if (role.equals("CUSTOMER")){
 			CustomUserDetails userDetails=accessConService.checkUserAccess();
 			Customer customer=findCustomer(userDetails.getId());
 
-			pages=transactionRepository.findAllByPolicyAccountIn(customer.getPolicyAccounts(),pageable);
+			pages=transactionRepository.findAllByPolicyAccountInAndStatus(customer.getPolicyAccounts(),pageable,"Done");
 		}
-		else pages = transactionRepository.findAll(pageable);
+		else pages = transactionRepository.findAllByStatus(pageable,"Done");
 
 		return pages.getContent();
 	}
@@ -288,7 +283,7 @@ public class DownloadServiceImp implements DownloadService{
 
 		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
 
-		Page<Transactions> pages = transactionRepository.findAllByPolicyAccount(policyAccount,pageable);
+		Page<Transactions> pages = transactionRepository.findAllByPolicyAccountAndStatus(policyAccount,pageable,"Done");
 		return pages.getContent();
 	}
 
@@ -372,7 +367,7 @@ public class DownloadServiceImp implements DownloadService{
 
 		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
 		Page<Agent> pages;
-		if(isActive)  pages = agentRepository.findAllByIsApprovedTrueAndIsActiveTrue(pageable);
+		if(isActive)  pages = agentRepository.findAllByIsActiveTrue(pageable);
 		else  pages = agentRepository.findAllByIsApprovedTrueAndIsActiveFalse(pageable);
 		return pages.getContent();
 	}

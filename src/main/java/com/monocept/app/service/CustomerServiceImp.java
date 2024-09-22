@@ -544,6 +544,14 @@ public class CustomerServiceImp implements CustomerService {
         documentUploadedDTO.setDocumentType(documentUploaded.getDocumentType().name());
         documentUploadedDTO.setIsApproved(documentUploaded.getIsApproved());
         documentUploadedDTO.setImageBase64(Base64.getEncoder().encodeToString(documentfromAws));
+        if(documentUploaded.getCustomer()!=null){
+            documentUploadedDTO.setCustomerName(documentUploaded.getCustomer().getFirstName()+" "+
+                    documentUploaded.getCustomer().getLastName());
+        }
+        if(documentUploaded.getAgent()!=null){
+            documentUploadedDTO.setCustomerName(documentUploaded.getAgent().getFirstName()+" "+
+                    documentUploaded.getAgent().getLastName());
+        }
         return documentUploadedDTO;
     }
 

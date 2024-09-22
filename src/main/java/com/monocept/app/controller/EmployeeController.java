@@ -265,11 +265,10 @@ public class EmployeeController {
     @Operation(summary = "By Admin,emp: approve documents")
     @PostMapping("/approve-document/{did}")
     ResponseEntity<Boolean> approveDocument(@PathVariable("did") Long documentId
-            , @RequestBody @Valid Boolean isApproved) {
+            ,@RequestParam(name="isApproved",defaultValue = "false")Boolean isApproved) {
         Boolean isSuccess = employeeService.approveDocument(documentId, isApproved);
         return new ResponseEntity<>(isSuccess, HttpStatus.OK);
     }
-
 
     @Operation(summary = "By Admin,emp: Get agents")
     @GetMapping("/agents")
@@ -286,7 +285,7 @@ public class EmployeeController {
             @RequestParam(name = "page", defaultValue = "0")
             int page, @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
-            @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "agentId") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
         PagedResponse<AgentDTO> allActiveAgents = agentService.getAllActiveAgents(page, size, sort, sortBy, sortDirection);
         return new ResponseEntity<>(allActiveAgents, HttpStatus.OK);
@@ -298,7 +297,7 @@ public class EmployeeController {
             @RequestParam(name = "page", defaultValue = "0")
             int page, @RequestParam(name = "size", defaultValue = "10") int size,
             @RequestParam(name = "sort", defaultValue = "ASC") String sort,
-            @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy,
+            @RequestParam(name = "sortBy", defaultValue = "agentId") String sortBy,
             @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
         PagedResponse<AgentDTO> allActiveAgents = agentService.getAllInActiveAgents(page, size, sort, sortBy, sortDirection);
         return new ResponseEntity<>(allActiveAgents, HttpStatus.OK);
