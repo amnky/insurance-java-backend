@@ -1,0 +1,76 @@
+package com.monocept.app.service;
+
+import com.monocept.app.dto.*;
+import com.monocept.app.utils.PagedResponse;
+import jakarta.validation.Valid;
+
+import jakarta.validation.Valid;
+
+import java.time.LocalDate;
+
+public interface EmployeeService {
+    EmployeeDTO getEmployeeProfile(Long empId);
+
+    EmployeeDTO updateEmployeeProfile(EmployeeDTO employeeDTO);
+
+	EmployeeDTO createEmployee(EmployeeCreationDTO employeeDTO);
+
+	EmployeeCreationDTO updateEmployee(Long id, EmployeeCreationDTO employeeDTO);
+
+	void deleteEmployee(Long id);
+
+	PagedResponse<EmployeeDTO> getAllEmployees(int page, int size, String sortBy, String direction);
+
+	PagedResponse<EmployeeDTO> getAllActiveEmployees(int page, int size, String sortBy, String direction);
+
+    PagedResponse<QueryDTO> getAllQueries(int page, int size, String sortBy, String direction);
+    StateDTO updateState(Long id, StateDTO stateDTO);
+    CityDTO updateCity(Long id, CityDTO cityDTO);
+    PagedResponse<StateDTO> getAllStates(int page, int size, String sortBy, String direction);
+
+    PagedResponse<CityDTO> getAllCities(int page, int size, String sortBy, String direction);
+
+    PagedResponse<InsuranceTypeDTO> getAllInsuranceTypes(int page, int size, String sortBy, String direction);
+
+
+    PagedResponse<QueryDTO> getAllResolvedQueries(int page, int size, String sortBy, String direction);
+
+    PagedResponse<QueryDTO> getAllUnresolvedQueries(int page, int size, String sortBy, String direction);
+
+    PagedResponse<QueryDTO> getAllQueriesByCustomer(int page, int size, String sortBy, String direction, Long id);
+
+    PagedResponse<TransactionsDTO> getAllTransactions(int page, int size, String sortBy, String direction);
+
+    PagedResponse<TransactionsDTO> getAllTransactionsByPolicyAccount(int page, int size, String sortBy,
+                                                                     String direction, Long id);
+
+    PagedResponse<TransactionsDTO> getAllTransactionsByCustomer(int page, int size, String sortBy, String direction,
+                                                                Long id);
+
+    PagedResponse<TransactionsDTO> getAllTransactionsBetweenDate(int page, int size, String sortBy, String direction,
+                                                                 LocalDate startDate, LocalDate endDate);
+
+    PagedResponse<FeedbackDTO> getAllFeedbacks(int page, int size, String sortBy, String direction);
+
+    PagedResponse<FeedbackDTO> getAllFeedbacksByCustomer(int page, int size, String sortBy, String direction, Long id);
+
+    Boolean approveCustomerProfile(Long customerId, Boolean isApproved);
+
+    Boolean approveDocument(Long documentId, Boolean isApproved);
+	PagedResponse<EmployeeDTO> getAllInactiveEmployees(int page, int size, String sortBy, String direction);
+
+	EmployeeCreationDTO getEmployeeById(Long id);
+
+	PagedResponse<PolicyAccountDTO> getAllPolicyAccount(int page, int size, String sortBy, String direction);
+
+	PagedResponse<PolicyAccountDTO> getAllPolicyAccountByCustomer(int page, int size, String sortBy, String direction,
+			Long id);
+
+	PagedResponse<PolicyAccountDTO> getAllPolicyAccountByAgent(int page, int size, String sortBy, String direction,
+			Long id);
+
+	PagedResponse<AgentDTO> getAllActiveAgent(int page, int size, String sortBy, String direction);
+
+	PagedResponse<AgentDTO> getAllInactiveAgent(int page, int size, String sortBy, String direction);
+
+}
