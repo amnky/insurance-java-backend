@@ -14,7 +14,6 @@ import com.monocept.app.exception.RoleAccessException;
 import com.monocept.app.exception.UserException;
 import com.monocept.app.repository.*;
 import com.monocept.app.utils.DocumentType;
-import com.monocept.app.utils.PagedResponse;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,16 +93,28 @@ public class StorageServiceImp implements StorageService {
 
     @Override
     public byte[] downloadPolicyImage(Long pid) {
-        Policy policy = policyRepository.findById(pid).orElseThrow(() -> new UserException("policy not found"));
+
+        Policy policy = findPolicyById(pid);
         Image image = policy.getImage();
         String cloudFileName = image.getCloudImageName();
         return downloadFromS3(cloudFileName);
     }
 
+    @Override
+    public byte[] downloadImage(Long policyId) {
+        Policy policy = findPolicyById(policyId);
+        String fileName = policy.getImage().getCloudImageName();
+        return downloadFromS3(fileName);
+    }
+
+    private Policy findPolicyById(Long policyId) {
+        return policyRepository.findById(policyId).orElseThrow(() -> new UserException("policy not found "));
+    }
+
     private byte[] downloadFromS3(String fileName) {
+        try{
         S3Object s3Object = s3Client.getObject(bucketName, fileName);
         S3ObjectInputStream inputStream = s3Object.getObjectContent();
-        try {
             byte[] content = IOUtils.toByteArray(inputStream);
             return content;
         } catch (IOException e) {
@@ -116,15 +127,36 @@ public class StorageServiceImp implements StorageService {
     @Override
     public Boolean addUserDocuments(DocumentUploadedDTO documentUploadedDTO, MultipartFile file) {
 
+        CustomUserDetails customUserDetails = accessConService.checkUserAccess();
+        if (customUserDetails.getId() == null) {
+            throw new RoleAccessException("you don't have access to upload documents");
+        }
         File fileObj = convertMultiPartFileToFile(file);
         String newFileName = System.currentTimeMillis() + "_" + documentUploadedDTO.getDocumentType() + file.getOriginalFilename();
         uploadDocToS3(fileObj, newFileName);
-        DocumentUploaded documentUploaded = new DocumentUploaded();
+        DocumentUploaded documentUploaded;
+        if (documentUploadedDTO.getCustomerId() != null) {
+            Customer customer = findCustomer(documentUploadedDTO.getCustomerId());
+            DocumentType documentType = DocumentType.valueOf(documentUploadedDTO.getDocumentType());
+            documentUploaded = documentUploadedRepository.findByCustomerAndDocumentType(customer, documentType);
+            if (documentUploaded == null) documentUploaded = new DocumentUploaded();
+            documentUploaded.setCustomer(customer);
+        } else if (documentUploadedDTO.getAgentId() != null) {
+            Agent agent = findAgent(documentUploadedDTO.getAgentId());
+            DocumentType documentType = DocumentType.valueOf(documentUploadedDTO.getDocumentType());
+            documentUploaded = documentUploadedRepository.findByAgentAndDocumentType(agent, documentType);
+            if (documentUploaded == null) documentUploaded = new DocumentUploaded();
+            documentUploaded.setAgent(agent);
+        } else {
+            documentUploaded = new DocumentUploaded();
+        }
         documentUploaded.setIsApproved(false);
         documentUploaded.setCloudFileName(newFileName);
         DocumentType document = DocumentType.valueOf(documentUploadedDTO.getDocumentType().toUpperCase());
         documentUploaded.setDocumentType(document);
-        mapWithUser(documentUploaded, documentUploadedDTO);
+
+        mapWithUser(documentUploaded, documentUploadedDTO,customUserDetails);
+
 
         return true;
     }
@@ -137,13 +169,15 @@ public class StorageServiceImp implements StorageService {
         deleteFromS3(fileName);
         documentUploaded.setIsApproved(false);
         documentUploadedRepository.save(documentUploaded);
-        EmailDTO emailDTO=new EmailDTO();
-        if(documentUploaded.getAgent()!=null)  emailDTO.setEmailId(documentUploaded.getAgent().getCredentials().getEmail());
-        else  if(documentUploaded.getCustomer()!=null)  emailDTO.setEmailId(documentUploaded.getCustomer().getCredentials().getEmail());
+
+        EmailDTO emailDTO = new EmailDTO();
+        if (documentUploaded.getAgent() != null)
+            emailDTO.setEmailId(documentUploaded.getAgent().getCredentials().getEmail());
+        else if (documentUploaded.getCustomer() != null)
+            emailDTO.setEmailId(documentUploaded.getCustomer().getCredentials().getEmail());
 
         emailDTO.setTitle("Document Deleted successfully");
-        emailDTO.setBody("Oops!! your document "+documentUploaded.getDocumentType()+" has been deleted, please upload it again.\n");
-
+        emailDTO.setBody("Oops!! your document " + documentUploaded.getDocumentType() + " has been deleted, please upload it again.\n");
         emailService.sendAccountCreationEmail(emailDTO);
         return true;
     }
@@ -162,8 +196,12 @@ public class StorageServiceImp implements StorageService {
     }
 
 
-    private void mapWithUser(DocumentUploaded documentUploaded, DocumentUploadedDTO documentUploadedDTO) {
-        if (documentUploadedDTO.getAgentId() != null) {
+    private void mapWithUser(DocumentUploaded documentUploaded, DocumentUploadedDTO documentUploadedDTO, CustomUserDetails customUserDetails) {
+        String role = accessConService.getUserRole();
+        if (role.equals("ROLE_AGENT")) {
+            if (!customUserDetails.getId().equals(documentUploadedDTO.getAgentId())) {
+                throw new UserException("You can only upload your own documents");
+            }
             Agent agent = findAgent(documentUploadedDTO.getAgentId());
             documentUploaded.setAgent(agent);
             documentUploaded = documentUploadedRepository.save(documentUploaded);
@@ -172,6 +210,18 @@ public class StorageServiceImp implements StorageService {
                 List<DocumentUploaded> documentUploadedList = new ArrayList<>();
                 documentUploadedList.add(documentUploaded);
                 agent.setDocuments(documentUploadedList);
+            }
+
+            agentRepository.save(agent);
+            EmailDTO emailDTO = new EmailDTO();
+            emailDTO.setEmailId(agent.getCredentials().getEmail());
+
+            emailDTO.setTitle("Document uploaded successfully");
+            emailDTO.setBody("Congrats!! your document " + documentUploaded.getDocumentType() + " has been uploaded.\n");
+            emailService.sendAccountCreationEmail(emailDTO);
+        } else {
+            if (!customUserDetails.getId().equals(documentUploadedDTO.getCustomerId()) && role.equals("CUSTOMER")) {
+                throw new UserException("You can only upload your own documents");
             }
         }
         if (documentUploadedDTO.getCustomerId() != null) {
@@ -184,11 +234,13 @@ public class StorageServiceImp implements StorageService {
                 documentUploadedList.add(documentUploaded);
                 customer.setDocuments(documentUploadedList);
             }
+            customerRepository.save(customer);
             EmailDTO emailDTO=new EmailDTO();
             emailDTO.setEmailId(customer.getCredentials().getEmail());
 
             emailDTO.setTitle("Document uploaded successfully");
-            emailDTO.setBody("Congrats!! your document "+documentUploaded.getDocumentType()+" has been uploaded.\n");
+
+            emailDTO.setBody("Congrats!! your document " + documentUploaded.getDocumentType() + " has been uploaded.\n");
             emailService.sendAccountCreationEmail(emailDTO);
         }
     }
