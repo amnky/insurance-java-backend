@@ -273,7 +273,7 @@ public class DownloadServiceImp implements DownloadService{
 	public List<Transactions> getAllTransactions(int page, int size, String sortBy, String direction) {
 		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
 
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		Pageable pageable = (Pageable) PageRequest.of(0, 100000, sort);
 		Page<Transactions> pages;
 		String role= accessConService.getUserRole();
 		if(role.equals("AGENT")){
@@ -299,7 +299,7 @@ public class DownloadServiceImp implements DownloadService{
 
 		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
 
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		Pageable pageable = (Pageable) PageRequest.of(0, 100000, sort);
 
 		Page<Transactions> pages = transactionRepository.findAllByPolicyAccountAndStatus(policyAccount,pageable,"Done");
 		return pages.getContent();
@@ -309,7 +309,7 @@ public class DownloadServiceImp implements DownloadService{
 	public List<WithdrawalRequests> getWithdrawals(int page, int size, String sortBy, String direction, Boolean isActive) {
 		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
 
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		Pageable pageable = (Pageable) PageRequest.of(0, 1000000, sort);
 		String role=accessConService.getUserRole();
 		Page<WithdrawalRequests> pages;
 		if(role.equals("AGENT")){
@@ -330,7 +330,6 @@ public class DownloadServiceImp implements DownloadService{
 
 	@Override
 	public Transactions getTransaction(Long id, int page, int size, String sortBy, String direction) {
-
 		return transactionRepository.findById(id).orElseThrow(()->new UserException("Transaction not found"));
 	}
 
@@ -338,7 +337,7 @@ public class DownloadServiceImp implements DownloadService{
 	public List<PolicyAccount> getPolicyAccountsInPDF(int page, int size, String sortBy, String direction, Boolean isActive) {
 		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
 
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		Pageable pageable = (Pageable) PageRequest.of(0, 1000000, sort);
 		String role=accessConService.getUserRole();
 		Page<PolicyAccount> pages;
 		if(role.equals("AGENT")){
@@ -362,7 +361,7 @@ public class DownloadServiceImp implements DownloadService{
 	public List<Customer> getAllCustomersInPdf(int page, int size, String sortBy, String direction, Boolean isActive) {
 		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
 
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		Pageable pageable = (Pageable) PageRequest.of(0, 10000000, sort);
 		String role=accessConService.getUserRole();
 		if(role.equals("CUSTOMER")){
 			throw new RoleAccessException("not allowed");
@@ -381,12 +380,12 @@ public class DownloadServiceImp implements DownloadService{
 	@Override
 	public List<Agent> getAllAgentsInPdf(int page, int size, String sortBy, String direction, Boolean isActive) {
 		accessConService.checkEmployeeAccess();
-		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
-
-		Pageable pageable = (Pageable) PageRequest.of(page, size, sort);
+		Sort sort = direction.equalsIgnoreCase(Sort.Direction.DESC.name())? Sort.by(sortBy).descending() :
+				Sort.by(sortBy).ascending();
+		Pageable pageable = (Pageable) PageRequest.of(0, 10000000, sort);
 		Page<Agent> pages;
 		if(isActive)  pages = agentRepository.findAllByIsActiveTrue(pageable);
-		else  pages = agentRepository.findAllByIsApprovedTrueAndIsActiveFalse(pageable);
+		else  pages = agentRepository.findAllByIsActiveFalse(pageable);
 		return pages.getContent();
 	}
 }

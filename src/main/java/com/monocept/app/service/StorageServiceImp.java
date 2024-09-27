@@ -155,7 +155,7 @@ public class StorageServiceImp implements StorageService {
         DocumentType document = DocumentType.valueOf(documentUploadedDTO.getDocumentType().toUpperCase());
         documentUploaded.setDocumentType(document);
 
-        mapWithUser(documentUploaded, documentUploadedDTO,customUserDetails);
+        mapWithUser(documentUploaded, documentUploadedDTO);
 
 
         return true;
@@ -196,12 +196,8 @@ public class StorageServiceImp implements StorageService {
     }
 
 
-    private void mapWithUser(DocumentUploaded documentUploaded, DocumentUploadedDTO documentUploadedDTO, CustomUserDetails customUserDetails) {
-        String role = accessConService.getUserRole();
-        if (role.equals("ROLE_AGENT")) {
-            if (!customUserDetails.getId().equals(documentUploadedDTO.getAgentId())) {
-                throw new UserException("You can only upload your own documents");
-            }
+    private void mapWithUser(DocumentUploaded documentUploaded, DocumentUploadedDTO documentUploadedDTO) {
+        if (documentUploadedDTO.getAgentId() != null) {
             Agent agent = findAgent(documentUploadedDTO.getAgentId());
             documentUploaded.setAgent(agent);
             documentUploaded = documentUploadedRepository.save(documentUploaded);
@@ -210,18 +206,6 @@ public class StorageServiceImp implements StorageService {
                 List<DocumentUploaded> documentUploadedList = new ArrayList<>();
                 documentUploadedList.add(documentUploaded);
                 agent.setDocuments(documentUploadedList);
-            }
-
-            agentRepository.save(agent);
-            EmailDTO emailDTO = new EmailDTO();
-            emailDTO.setEmailId(agent.getCredentials().getEmail());
-
-            emailDTO.setTitle("Document uploaded successfully");
-            emailDTO.setBody("Congrats!! your document " + documentUploaded.getDocumentType() + " has been uploaded.\n");
-            emailService.sendAccountCreationEmail(emailDTO);
-        } else {
-            if (!customUserDetails.getId().equals(documentUploadedDTO.getCustomerId()) && role.equals("CUSTOMER")) {
-                throw new UserException("You can only upload your own documents");
             }
         }
         if (documentUploadedDTO.getCustomerId() != null) {
@@ -234,17 +218,14 @@ public class StorageServiceImp implements StorageService {
                 documentUploadedList.add(documentUploaded);
                 customer.setDocuments(documentUploadedList);
             }
-            customerRepository.save(customer);
             EmailDTO emailDTO=new EmailDTO();
             emailDTO.setEmailId(customer.getCredentials().getEmail());
 
             emailDTO.setTitle("Document uploaded successfully");
-
-            emailDTO.setBody("Congrats!! your document " + documentUploaded.getDocumentType() + " has been uploaded.\n");
+            emailDTO.setBody("Congrats!! your document "+documentUploaded.getDocumentType()+" has been uploaded.\n");
             emailService.sendAccountCreationEmail(emailDTO);
         }
     }
-
     private Agent findAgent(Long agentId) {
         return agentRepository.findById(agentId).orElseThrow(() -> new UserException("agent not found"));
     }

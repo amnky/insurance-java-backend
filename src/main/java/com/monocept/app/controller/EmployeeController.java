@@ -270,27 +270,21 @@ public class EmployeeController {
         return new ResponseEntity<>(isSuccess, HttpStatus.OK);
     }
 
-//<<<<<<< HEAD
-//
-//    @Operation(summary = "By Admin,emp: Get agents")
-//    @GetMapping("/agents")
-//    ResponseEntity<PagedResponse<AgentDTO>> getAllAgents(@RequestParam(name = "pageNo", defaultValue = "0") int pageNo, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "ASC") String sort, @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy, @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-//        PagedResponse<AgentDTO> allAgents = agentService.getAllAgents(pageNo, size, sort, sortBy, sortDirection);
-//        return new ResponseEntity<>(allAgents, HttpStatus.OK);
-//    }
-//
-//    @Operation(summary = "By Admin,emp: Get All active customers")
-//    @GetMapping("/customers")
-//    ResponseEntity<PagedResponse<CustomerDTO>> getAllActiveCustomers(@RequestParam(name = "pageNo", defaultValue = "0") int pageNo, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "ASC") String sort, @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy, @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-//        PagedResponse<CustomerDTO> allCustomers = customerService.getAllCustomers(pageNo, size, sort, sortBy, sortDirection);
-//        return new ResponseEntity<>(allCustomers, HttpStatus.OK);
-//    }
-//
-//    @Operation(summary = "By Admin,emp: Get All inactive customers")
-//    @GetMapping("/inactive-customers")
-//    ResponseEntity<PagedResponse<CustomerDTO>> getAllInActiveCustomers(@RequestParam(name = "pageNo", defaultValue = "0") int pageNo, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "ASC") String sort, @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy, @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
-//        PagedResponse<CustomerDTO> allCustomers = customerService.getAllInActiveCustomers(pageNo, size, sort, sortBy, sortDirection);
-//        return new ResponseEntity<>(allCustomers, HttpStatus.OK);
+
+
+    @Operation(summary = "By Admin,emp: Get All active customers")
+    @GetMapping("/customers")
+    ResponseEntity<PagedResponse<CustomerDTO>> getAllCustomers(@RequestParam(name = "pageNo", defaultValue = "0") int pageNo, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "ASC") String sort, @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy, @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
+        PagedResponse<CustomerDTO> allCustomers = customerService.getAllCustomers(pageNo, size, sort, sortBy, sortDirection);
+        return new ResponseEntity<>(allCustomers, HttpStatus.OK);
+    }
+
+    @Operation(summary = "By Admin,emp: Get All inactive customers")
+    @GetMapping("/inactive-customers")
+    ResponseEntity<PagedResponse<CustomerDTO>> getAllInActiveCustomers(@RequestParam(name = "pageNo", defaultValue = "0") int pageNo, @RequestParam(name = "size", defaultValue = "10") int size, @RequestParam(name = "sort", defaultValue = "ASC") String sort, @RequestParam(name = "sortBy", defaultValue = "firstName") String sortBy, @RequestParam(name = "sortDirection", defaultValue = "ASC") String sortDirection) {
+        PagedResponse<CustomerDTO> allCustomers = customerService.getAllInActiveCustomers(pageNo, size, sort, sortBy, sortDirection);
+        return new ResponseEntity<>(allCustomers, HttpStatus.OK);
+    }
 //=======
     @Operation(summary = "By Admin,emp: Get agents")
     @GetMapping("/agents")
